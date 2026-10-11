@@ -1,0 +1,10 @@
+{
+  "name": "Neon Arcade",
+  "short_name": "Neon Arcade",
+  "description": "Quick-play arcade games",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090b1a",
+  "theme_color": "#090b1a",
+  "icons": []
+}

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b1a">
+  <meta name="description" content="Play Neon Dodge, a free quick-play arcade game. Dodge the blocks and beat your high score.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>Neon Arcade — Dodge the Blocks</title>
+  <style>
+    :root { color-scheme: dark; --bg:#090b1a; --panel:#12162c; --cyan:#62f6ff; --pink:#ff4fbc; --text:#f4f6ff; --muted:#a9b1d6; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(ellipse at top,#1b2250 0%,var(--bg) 58%); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+    .wrap { width:min(960px,100%); margin:auto; padding:22px 16px 36px; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; }
+    .brand { font-weight:900; letter-spacing:.04em; font-size:clamp(1.2rem,4vw,1.7rem); }
+    .brand span { color:var(--cyan); }
+    .pill { border:1px solid #31395f; color:var(--muted); border-radius:999px; padding:7px 11px; font-size:.8rem; white-space:nowrap; }
+    .hero { text-align:center; margin:18px auto 22px; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,7vw,3.2rem); line-height:1.05; }
+    h1 span { color:var(--cyan); text-shadow:0 0 22px #62f6ff44; }
+    .sub { color:var(--muted); margin:0 auto; max-width:560px; line-height:1.5; }
+    .game-card { background:linear-gradient(180deg,#151a35,#0d1023); border:1px solid #2a3157; border-radius:22px; padding:14px; box-shadow:0 18px 60px #0007; }
+    .stats { display:flex; justify-content:space-between; gap:10px; margin:2px 2px 12px; }
+    .stat { flex:1; background:#090c1b; border:1px solid #242b4b; border-radius:12px; padding:10px; text-align:center; }
+    .stat small { display:block; color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; }
+    .stat strong { display:block; font-size:1.25rem; margin-top:2px; }
+    canvas { display:block; width:100%; max-width:540px; height:auto; margin:0 auto; border-radius:15px; background:#080b18; border:1px solid #252d50; touch-action:none; }
+    .actions { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; margin:14px 0 8px; }
+    button { font:inherit; font-weight:750; border:0; border-radius:12px; padding:12px 18px; cursor:pointer; }
+    .primary { background:var(--cyan); color:#07101a; box-shadow:0 0 24px #62f6ff25; }
+    .secondary { background:#202747; color:var(--text); border:1px solid #343e68; }
+    button:focus-visible { outline:3px solid white; outline-offset:3px; }
+    .touch { display:flex; gap:12px; justify-content:center; margin-top:10px; }
+    .touch button { width:100px; font-size:1.2rem; padding:12px; }
+    .hint { color:var(--muted); text-align:center; font-size:.88rem; margin:10px 0 0; }
+    .below { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+    .info { background:#11152b; border:1px solid #252d50; border-radius:16px; padding:16px; }
+    .info h2 { margin:0 0 7px; font-size:1rem; }
+    .info p { margin:0; color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .ad-slot { margin-top:16px; min-height:74px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed #394166; border-radius:14px; color:#7781a8; font-size:.78rem; text-align:center; padding:12px; }
+    footer { text-align:center; color:#7781a8; font-size:.8rem; margin-top:20px; }
+    @media(max-width:560px) { .wrap{padding:16px 12px 28px} .below{grid-template-columns:1fr} .game-card{padding:10px} .pill{font-size:.7rem} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header><div class="brand">NEON <span>ARCADE</span></div><div class="pill">FREE TO PLAY</div></header>
+    <section class="hero">
+      <h1>DODGE <span>THE BLOCKS</span></h1>
+      <p class="sub">How long can you survive? Move fast, dodge the neon blocks, and beat your best score.</p>
+    </section>
+
+    <section class="game-card" aria-label="Arcade game">
+      <div class="stats">
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Best</small><strong id="best">0</strong></div>
+        <div class="stat"><small>Status</small><strong id="status">Ready</strong></div>
+      </div>
+      <canvas id="game" width="540" height="620" aria-label="Dodge the falling blocks game area"></canvas>
+      <div class="actions">
+        <button id="start" class="primary">▶ Start game</button>
+        <button id="pause" class="secondary">Ⅱ Pause</button>
+      </div>
+      <div class="touch">
+        <button id="left" class="secondary" aria-label="Move left">←</button>
+        <button id="right" class="secondary" aria-label="Move right">→</button>
+      </div>
+      <p class="hint">Use ← → or A / D on a keyboard, or tap the controls. On phones, you can also drag on the game area.</p>
+    </section>
+
+    <div class="below">
+      <section class="info"><h2>🎯 How to play</h2><p>Stay in the safe gaps and avoid the falling blocks. Your score rises as you survive. The game gets faster over time.</p></section>
+      <section class="info"><h2>🚀 More games coming</h2><p>This is the first game in the Neon Arcade starter. Add more original games and categories as your audience grows.</p></section>
+    </div>
+
+    <div class="ad-slot"><strong>ADVERTISEMENT SPACE</strong><span>Placeholder only — connect an approved ad network after publishing and approval.</span></div>
+    <footer>© <span id="year"></span> Neon Arcade · Play fair, have fun.</footer>
+  </main>
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const statusEl = document.getElementById('status');
+  const startBtn = document.getElementById('start');
+  const pauseBtn = document.getElementById('pause');
+  const W = canvas.width, H = canvas.height;
+  let best = Number(localStorage.getItem('neonArcadeBest') || 0);
+  let score = 0, player, blocks, running = false, paused = false, ended = false;
+  let last = 0, spawnTimer = 0, speed = 190, raf = null;
+  const keys = { left:false, right:false };
+  bestEl.textContent = best;
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function reset() {
+    score = 0; spawnTimer = 0; speed = 190; blocks = [];
+    player = { x: W/2-18, y: H-78, w:36, h:36, vx:0 };
+    scoreEl.textContent = '0'; statusEl.textContent = 'Playing';
+    running = true; paused = false; ended = false; last = performance.now();
+    startBtn.textContent = '↻ Restart'; pauseBtn.textContent = 'Ⅱ Pause';
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+  function drawBackground() {
+    ctx.fillStyle = '#080b18'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = '#151c39'; ctx.lineWidth = 1;
+    for (let x=20; x<W; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=20; y<H; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.fillStyle = '#62f6ff'; ctx.globalAlpha = .45;
+    for (let i=0;i<24;i++) { const x=(i*97+31)%W, y=(i*137+17)%H; ctx.fillRect(x,y,2,2); }
+    ctx.globalAlpha = 1;
+  }
+  function roundedRect(x,y,w,h,r,fill) {
+    ctx.fillStyle=fill; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill();
+  }
+  function draw() {
+    drawBackground();
+    if (blocks) blocks.forEach(b => {
+      ctx.shadowBlur=18; ctx.shadowColor='#ff4fbc';
+      roundedRect(b.x,b.y,b.w,b.h,7,'#ff4fbc'); ctx.shadowBlur=0;
+      ctx.fillStyle='#ffd2f0'; ctx.fillRect(b.x+5,b.y+4,b.w-10,3);
+    });
+    if (player) {
+      ctx.shadowBlur=22; ctx.shadowColor='#62f6ff';
+      roundedRect(player.x,player.y,player.w,player.h,9,'#62f6ff'); ctx.shadowBlur=0;
+      roundedRect(player.x+8,player.y+8,player.w-16,player.h-16,4,'#101a36');
+    }
+    if (!running) {
+      ctx.fillStyle='#070a16c9'; ctx.fillRect(0,0,W,H);
+      ctx.textAlign='center';
+      ctx.fillStyle='#f4f6ff'; ctx.font='800 32px system-ui';
+      ctx.fillText(ended ? 'GAME OVER' : 'READY PLAYER ONE',W/2,H/2-16);
+      ctx.fillStyle='#a9b1d6'; ctx.font='18px system-ui';
+      ctx.fillText(ended ? `Score: ${score} · Tap Restart to play again` : 'Press Start game to begin',W/2,H/2+22);
+    } else if (paused) {
+      ctx.fillStyle='#070a16b8'; ctx.fillRect(0,0,W,H);
+      ctx.textAlign='center'; ctx.fillStyle='#f4f6ff'; ctx.font='800 34px system-ui'; ctx.fillText('PAUSED',W/2,H/2);
+    }
+  }
+  function hit(a,b) { return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
+  function loop(now) {
+    if (!running || paused) { draw(); return; }
+    const dt = Math.min((now-last)/1000, .035); last = now;
+    score += dt * 10; speed = 190 + Math.min(score*1.5, 260);
+    scoreEl.textContent = Math.floor(score);
+    player.vx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+    player.x = Math.max(0, Math.min(W-player.w, player.x + player.vx*310*dt));
+    spawnTimer += dt;
+    const interval = Math.max(.34, .92 - score/180);
+    if (spawnTimer >= interval) {
+      spawnTimer = 0;
+      const w = 35 + Math.random()*58;
+      blocks.push({x:Math.random()*(W-w), y:-35, w, h:20+Math.random()*25, vy:speed*(.82+Math.random()*.45)});
+    }
+    for (const b of blocks) { b.y += b.vy*dt; if (hit(player,b)) { gameOver(); return; } }
+    blocks = blocks.filter(b => b.y < H+50);
+    draw(); raf = requestAnimationFrame(loop);
+  }
+  function gameOver() {
+    running=false; ended=true; statusEl.textContent='Game over';
+    const finalScore=Math.floor(score);
+    if (finalScore > best) { best=finalScore; localStorage.setItem('neonArcadeBest',best); bestEl.textContent=best; }
+    draw();
+  }
+  startBtn.addEventListener('click', reset);
+  pauseBtn.addEventListener('click', () => {
+    if (!running) return;
+    paused = !paused;
+    statusEl.textContent = paused ? 'Paused' : 'Playing';
+    pauseBtn.textContent = paused ? '▶ Resume' : 'Ⅱ Pause';
+    if (!paused) { last=performance.now(); raf=requestAnimationFrame(loop); } else draw();
+  });
+  document.addEventListener('keydown', e => {
+    if (['ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+    if (e.key==='ArrowLeft'||e.key.toLowerCase()==='a') keys.left=true;
+    if (e.key==='ArrowRight'||e.key.toLowerCase()==='d') keys.right=true;
+    if (e.key===' ' && !running) reset();
+  });
+  document.addEventListener('keyup', e => {
+    if (e.key==='ArrowLeft'||e.key.toLowerCase()==='a') keys.left=false;
+    if (e.key==='ArrowRight'||e.key.toLowerCase()==='d') keys.right=false;
+  });
+  function holdButton(id, direction) {
+    const el=document.getElementById(id);
+    const on=ev=>{ev.preventDefault(); keys[direction]=true;};
+    const off=ev=>{ev.preventDefault(); keys[direction]=false;};
+    el.addEventListener('pointerdown',on); el.addEventListener('pointerup',off);
+    el.addEventListener('pointercancel',off); el.addEventListener('pointerleave',off);
+  }
+  holdButton('left','left'); holdButton('right','right');
+  let dragging=false;
+  canvas.addEventListener('pointerdown', e => { dragging=true; canvas.setPointerCapture(e.pointerId); movePlayer(e); });
+  canvas.addEventListener('pointermove', e => { if(dragging) movePlayer(e); });
+  canvas.addEventListener('pointerup',()=>dragging=false);
+  canvas.addEventListener('pointercancel',()=>dragging=false);
+  function movePlayer(e) {
+    if (!player) return;
+    const rect=canvas.getBoundingClientRect();
+    const x=(e.clientX-rect.left)*W/rect.width;
+    player.x=Math.max(0,Math.min(W-player.w,x-player.w/2));
+  }
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
